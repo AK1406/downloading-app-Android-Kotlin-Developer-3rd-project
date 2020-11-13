@@ -4,9 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_weight="3"
+    android:background="@color/colorPrimaryDark"
     tools:context=".MainActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
+   <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
@@ -20,6 +22,20 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/content_main" />
+    <ImageView
+        android:layout_width="300dp"
+        android:layout_height="250dp"
+        android:layout_marginTop="50dp"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/ic_cloud_download"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="450dp"
+        android:layout_gravity="bottom">
+
+        <include layout="@layout/content_main" />
+    </FrameLayout>
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
