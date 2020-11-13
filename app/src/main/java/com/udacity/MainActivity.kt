@@ -1,24 +1,19 @@
 package com.udacity
 
 import android.animation.*
-import android.app.DownloadManager
-import android.app.NotificationManager
-import android.app.PendingIntent
+import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
-import android.graphics.Paint
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.view.View
-import android.view.animation.DecelerateInterpolator
-import android.view.animation.LinearInterpolator
-import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 
@@ -37,20 +32,24 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
+        createChannel(
+                getString(R.string.notification_channel_id),
+                getString(R.string.notification_channel_name)
+        )
         registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
 
         custom_button.setOnClickListener {
 
               when {
                   glide.isChecked -> {URL = "https://github.com/bumptech/glide"
-                    //  download()
+                      download()
                       }
                   load.isChecked -> { URL =
                       "https://github.com/udacity/nd940-c3-advanced-android-programming-project-starter"
-                      //download()
+                      download()
                   }
                   retrofit.isChecked ->{URL = "https://github.com/square/retrofit"
-                    //  download()
+                    download()
                   }
                   else -> {
                       Toast.makeText(this, "Please select any option", Toast.LENGTH_LONG).show().toString()
@@ -58,14 +57,20 @@ class MainActivity : AppCompatActivity() {
 
                   }
               }
-
-
         }
     }
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+            val notificationManager = ContextCompat.getSystemService(
+                    context!!,
+                    NotificationManager::class.java
+            ) as NotificationManager
+            notificationManager.sendNotification(
+                    context.getText(R.string.download).toString(),
+                    context
+            )
         }
     }
 
@@ -90,6 +95,37 @@ class MainActivity : AppCompatActivity() {
         */private const val CHANNEL_ID = "channelId"
     }
 
+
+    private fun createChannel(channelId: String, channelName: String) {
+        // TODO: Step 1.6 START create a channel
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel = NotificationChannel(
+                    channelId,
+                    channelName,
+                    // TODO: Step 2.4 change importance
+                    NotificationManager.IMPORTANCE_HIGH
+            )
+                    // TODO: Step 2.6 disable badges for this channel
+                    .apply {
+                        setShowBadge(false)
+                    }
+
+            notificationChannel.enableLights(true)
+            notificationChannel.lightColor = Color.RED
+            notificationChannel.enableVibration(true)
+            notificationChannel.description = "Time for breakfast"
+
+            val notificationManager = this.getSystemService(
+                    NotificationManager::class.java
+            )
+            notificationManager.createNotificationChannel(notificationChannel)
+
+
+            // TODO: Step 1.6 END create a channel
+
+        }
+
+    }
 
 
 }
