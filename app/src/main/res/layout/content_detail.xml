@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -29,15 +31,16 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="File Name:"
+                android:text="@string/file_name"
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/fileName"
+                android:id="@+id/file_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:hint="downloaded file name"
+                android:layout_marginStart="20dp"
+                android:textColor="#070707"
+                android:hint="@string/downloaded_file_name"
                 android:textSize="18sp" />
 
 
@@ -54,15 +57,16 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Status:       "
+                android:text="@string/status"
                 android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:hint=" status of download"
+                android:layout_marginStart="45dp"
+                android:textColor="#C52115"
+                android:hint="@string/status_of_download"
                 android:textSize="18sp" />
 
 
@@ -75,16 +79,18 @@
         android:id="@+id/okBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:layout_marginBottom="10dp"
-        android:text="OK"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="100dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginBottom="20dp"
+        android:background="@color/colorAccent"
+        android:text="OK"
+        android:textColor="#fff"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-        app:layout_constraintVertical_bias="1.0"
-        android:background="@color/colorAccent"/>
+        app:layout_constraintVertical_bias="1.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

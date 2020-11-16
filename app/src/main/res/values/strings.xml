@@ -19,4 +19,8 @@
     <string name="notification_channel_name">Loading</string>
     <string name="download">Downloaded !</string>
     <string name="check">Check</string>
+    <string name="downloaded_file_name">downloaded file name</string>
+    <string name="file_name">File Name:</string>
+    <string name="status">Status:</string>
+    <string name="status_of_download">status of download</string>
 </resources>

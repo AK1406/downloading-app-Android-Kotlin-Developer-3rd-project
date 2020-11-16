@@ -4,6 +4,5 @@
 <!--   TODO: create custom attributes for the view-->
         <attr name="bgColor" format="color"/>
         <attr name="fgColor" format="color"/>
-        <attr name="percentage" format="float"/>
     </declare-styleable>
 </resources>

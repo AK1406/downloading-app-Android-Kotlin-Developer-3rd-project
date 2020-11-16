@@ -34,12 +34,13 @@ private val FLAGS = 0
  *
  * @param context, activity context.
  */
-fun NotificationManager.sendNotification(messageBody: String, applicationContext: Context) {
+fun NotificationManager.sendNotification(messageBody: String, status : String , applicationContext: Context) {
     // Create the content intent for the notification, which launches
     // this activity
     // TODO: Step 1.11 create intent
     val contentIntent = Intent(applicationContext, DetailActivity::class.java)
-
+    contentIntent.putExtra("fileName",messageBody)
+    contentIntent.putExtra("status", status)
     // TODO: Step 1.12 create PendingIntent
     val contentPendingIntent = PendingIntent.getActivity(
         applicationContext,
@@ -51,21 +52,11 @@ fun NotificationManager.sendNotification(messageBody: String, applicationContext
     // TODO: Step 2.0 add style
     val downloadImage = BitmapFactory.decodeResource(
         applicationContext.resources,
-        R.drawable.ic_cloud_download
+        R.drawable.cloud
     )
     val bigPicStyle = NotificationCompat.BigPictureStyle()
         .bigPicture(downloadImage)
         .bigLargeIcon(null)
-
-/*
-    // TODO: Step 2.2 add snooze action
-    val snoozeIntent = Intent(applicationContext, SnoozeReceiver::class.java)
-    val snoozePendingIntent: PendingIntent = PendingIntent.getBroadcast(
-        applicationContext,
-        REQUEST_CODE,
-        snoozeIntent,
-        FLAGS
-    )*/
 
     // TODO: Step 1.2 get an instance of NotificationCompat.Builder
     // Build the notification
@@ -85,7 +76,7 @@ fun NotificationManager.sendNotification(messageBody: String, applicationContext
         .setContentText(messageBody)
 
     // TODO: Step 1.13 set content intent
-        .setContentIntent(contentPendingIntent)
+      //  .setContentIntent(contentPendingIntent)
         .setAutoCancel(true)
         // TODO: Step 2.1 add style to builder
         .setStyle(bigPicStyle)
