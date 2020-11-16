@@ -1,6 +1,6 @@
 package com.udacity
 
-import android.app.DownloadManager
+
 import android.app.NotificationManager
 import android.content.Intent
 import android.os.Bundle
@@ -30,7 +30,6 @@ class DetailActivity : AppCompatActivity() {
         file_name.text = file
         status.text = cStatus
 
-         // TODO: Step 1.15 call cancel notification
         val notificationManager =
                 ContextCompat.getSystemService(
                     application,
@@ -39,8 +38,5 @@ class DetailActivity : AppCompatActivity() {
         notificationManager.cancelNotifications()
 
 
-
     }
-
-
 }

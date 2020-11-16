@@ -8,12 +8,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.database.Cursor
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
@@ -25,11 +23,10 @@ import kotlinx.android.synthetic.main.content_main.*
 class MainActivity : AppCompatActivity() {
 
     var fileName = ""
+    var check_status = "Fail"
     private var downloadID: Long = 0
+    private  var downloadManager: DownloadManager? = null
 
-    var flag = true
-    var downloading = true
-    var check_status = ""
 
     private lateinit var notificationManager: NotificationManager
     private lateinit var pendingIntent: PendingIntent
@@ -75,10 +72,22 @@ class MainActivity : AppCompatActivity() {
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
 
-
-            val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
-
-
+            val action = intent!!.action
+            if (DownloadManager.ACTION_DOWNLOAD_COMPLETE == action) {
+                val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+                val query = DownloadManager.Query()
+                query.setFilterById(downloadID);
+                val c = downloadManager!!.query(query)
+                if (c.moveToFirst()) {
+                    val columnIndex = c
+                        .getColumnIndex(DownloadManager.COLUMN_STATUS)
+                    if (DownloadManager.STATUS_SUCCESSFUL == c
+                            .getInt(columnIndex)
+                    ) {
+                        check_status = " Success"
+                    }
+                }
+            }
             val notificationManager = ContextCompat.getSystemService(
                 context!!,
                 NotificationManager::class.java
@@ -91,6 +100,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
     private fun download() {
         val request =
             DownloadManager.Request(Uri.parse(URL))
@@ -101,36 +111,9 @@ class MainActivity : AppCompatActivity() {
                 .setAllowedOverRoaming(true)
 
 
+        downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+        downloadID = downloadManager!!.enqueue(request)// enqueue puts the download request in the queue.
 
-        val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-        downloadID = downloadManager.enqueue(request)// enqueue puts the download request in the queue.
-
-        val query: DownloadManager.Query?
-        query = DownloadManager.Query()
-        var c: Cursor?
-        query.setFilterByStatus(DownloadManager.STATUS_FAILED or DownloadManager.STATUS_PAUSED or DownloadManager.STATUS_SUCCESSFUL or DownloadManager.STATUS_RUNNING or DownloadManager.STATUS_PENDING)
-        while (downloading) {
-            c = downloadManager.query(query);
-            if(c.moveToFirst()) {
-                Log.i ("FLAG","Downloading");
-                val status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
-
-                if (status==DownloadManager.STATUS_SUCCESSFUL) {
-                    Log.i ("FLAG","done")
-                    check_status = "Success"
-                    downloading = false
-                    flag=true;
-                    break;
-                }
-                if (status==DownloadManager.STATUS_FAILED) {
-                    Log.i ("FLAG","Fail");
-                    check_status="Fail"
-                    downloading = false;
-                    flag=false;
-                    break;
-                }
-            }
-        }
 
     }
 
