@@ -2,7 +2,12 @@ package com.udacity
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Color.parseColor
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Rect
+import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
@@ -21,11 +26,8 @@ class LoadingButton @JvmOverloads constructor(
     private var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed)
     { p, old, new ->
 
-
     }
-
-
-    private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    private val paint : Paint= Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
         textAlign = Paint.Align.CENTER
         textSize = 55.0f
@@ -35,20 +37,27 @@ class LoadingButton @JvmOverloads constructor(
     init {
        /// isClickable = true
     }
-    private val bgPaint: Int = Color.parseColor("#FF004349")
+    private val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
+        textAlign = Paint.Align.CENTER
+        textSize = 55.0f
+        typeface = Typeface.create("", Typeface.BOLD)
+
+    }
+
 
 
     override fun onDraw(canvas: Canvas?) {
 
-        paint.color=Color.parseColor("#FF07C2AA")
+        paint.color= Color.parseColor("#07C2AA")
         canvas?.drawRect(0.0F, 0.0F, widthSize.toFloat(), heightSize.toFloat(), paint)
-        paint.color= Color.WHITE
+
+      //  canvas?.drawRect(0.0F, 0.0F, widthSize.toFloat(), heightSize.toFloat(), bgPaint)
+        paint.color=  Color.WHITE
         drawCenterText(canvas!!, 650.0F, 70.0F)
         if(isClicked) {
-
-            canvas.drawCircle(((width / 2) + 300.0).toFloat(), (height / 2).toFloat(), 35.0F, paint)
+            isClicked = false
         }
-
 
         super.onDraw(canvas)
 

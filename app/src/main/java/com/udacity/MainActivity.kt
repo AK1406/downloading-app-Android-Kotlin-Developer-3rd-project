@@ -1,17 +1,20 @@
 package com.udacity
 
+
 import android.app.DownloadManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.net.Uri
+import android.opengl.Visibility
 import android.os.Build
 import android.os.Bundle
+import android.view.View
+import android.view.View.VISIBLE
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
@@ -27,12 +30,7 @@ class MainActivity : AppCompatActivity() {
     private var downloadID: Long = 0
     private  var downloadManager: DownloadManager? = null
 
-
-    private lateinit var notificationManager: NotificationManager
-    private lateinit var pendingIntent: PendingIntent
-    private lateinit var action: NotificationCompat.Action
-
-
+    lateinit var circle : IndicatorView
     private lateinit var URL : String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,9 +42,13 @@ class MainActivity : AppCompatActivity() {
             getString(R.string.notification_channel_name)
         )
 
+
+         circle = findViewById(R.id.indicator1)
         registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
 
         custom_button.setOnClickListener {
+            circle.visibility = View.VISIBLE
+            circle.colors = listOf(com.udacity.Color.WHITE)
               when {
                   glide.isChecked -> {URL = "https://github.com/bumptech/glide"
                       fileName= getString(R.string.glide)
@@ -62,7 +64,7 @@ class MainActivity : AppCompatActivity() {
                        download()
                   }
                   else -> {
-                      Toast.makeText(this, "Please select any option", Toast.LENGTH_LONG).show().toString()
+                     Toast.makeText(this, "Please select any option", Toast.LENGTH_LONG).show().toString()
 
                   }
               }
@@ -88,6 +90,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+
             val notificationManager = ContextCompat.getSystemService(
                 context!!,
                 NotificationManager::class.java
@@ -129,7 +132,7 @@ private const val CHANNEL_ID = "channelId"
 */
 
     private fun createChannel(channelId: String, channelName: String) {
-        // TODO: Step 1.6 START create a channel
+        // create a channel
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationChannel = NotificationChannel(
                 channelId,
