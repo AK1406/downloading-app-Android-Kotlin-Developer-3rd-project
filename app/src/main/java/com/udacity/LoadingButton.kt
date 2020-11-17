@@ -1,16 +1,15 @@
 package com.udacity
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color.parseColor
+import android.content.res.TypedArray
+import android.graphics.*
 import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Rect
-import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import android.view.animation.LinearInterpolator
 import kotlin.properties.Delegates
 
 
@@ -27,6 +26,14 @@ class LoadingButton @JvmOverloads constructor(
     { p, old, new ->
 
     }
+
+    var mPercentage = 0f
+    var mBgColor :Int = 0
+    var mFgColor:Int = 0
+
+     var  mPaintBar : Paint
+     var mPaintProgress : Paint
+
     private val paint : Paint= Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
         textAlign = Paint.Align.CENTER
@@ -34,35 +41,66 @@ class LoadingButton @JvmOverloads constructor(
         typeface = Typeface.create("", Typeface.BOLD)
     }
 
+
     init {
        /// isClickable = true
-    }
-    private val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.FILL
-        textAlign = Paint.Align.CENTER
-        textSize = 55.0f
-        typeface = Typeface.create("", Typeface.BOLD)
+
+        val typedArray: TypedArray = getContext().obtainStyledAttributes(attrs, R.styleable.LoadingButton)
+        mBgColor = typedArray.getInteger(
+            R.styleable.LoadingButton_bgColor,
+            R.color.colorPrimaryDark
+        )
+        mFgColor = typedArray.getInteger(R.styleable.LoadingButton_fgColor, R.color.colorPrimary);
+        mPercentage = typedArray.getFloat(R.styleable.LoadingButton_percentage, 10f);
+
+        typedArray.recycle()
+        mPaintBar = Paint(Paint.ANTI_ALIAS_FLAG);
+        mPaintProgress = Paint(Paint.ANTI_ALIAS_FLAG);
+        mPaintBar.color = mBgColor;
+        mPaintProgress.color = mFgColor;
 
     }
 
+    private fun startAnimation() {
+       val animator = ValueAnimator.ofInt(0, 100).apply {
+            duration = 650
+            interpolator = LinearInterpolator()
+            addUpdateListener { valueAnimator ->
+                mPercentage = (valueAnimator.animatedValue as Int).toFloat()
+                invalidate()
+            }
+        }
+        animator?.start()
+    }
 
 
     override fun onDraw(canvas: Canvas?) {
 
-        paint.color= Color.parseColor("#07C2AA")
-        canvas?.drawRect(0.0F, 0.0F, widthSize.toFloat(), heightSize.toFloat(), paint)
-
-      //  canvas?.drawRect(0.0F, 0.0F, widthSize.toFloat(), heightSize.toFloat(), bgPaint)
+        super.onDraw(canvas)
+        canvas?.drawRect(0.0F, 0.0F, widthSize.toFloat(), heightSize.toFloat(), mPaintBar)
         paint.color=  Color.WHITE
         drawCenterText(canvas!!, 650.0F, 70.0F)
-        if(isClicked) {
-            isClicked = false
+        if(isClicked){
+            canvas.drawRect(
+                0.0F,
+                0.0F,
+                (0F + getProgressWidth()),
+                heightSize.toFloat(),
+                mPaintProgress
+            )
         }
-
-        super.onDraw(canvas)
 
     }
 
+
+    private fun getProgressWidth(): Int {
+        startAnimation()
+        return if (mPercentage in 0.0..100.0) {
+            ((widthSize * mPercentage / 100).toInt())
+        } else {
+            0
+        }
+    }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val minw: Int = paddingLeft + paddingRight + suggestedMinimumWidth

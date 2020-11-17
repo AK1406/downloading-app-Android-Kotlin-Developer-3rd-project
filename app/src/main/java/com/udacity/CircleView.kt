@@ -34,14 +34,6 @@ class IndicatorView @JvmOverloads constructor(
     private val greyColor = ContextCompat.getColor(context, R.color.white)
     private var arcs = emptyList<Arc>()
 
-/*
-    private val colorMap = mapOf(Color.WHITE to ContextCompat.getColor(context, R.color.mtg_white),
-        Color.BLUE to ContextCompat.getColor(context, R.color.mtg_blue),
-        Color.BLACK to ContextCompat.getColor(context, R.color.mtg_black),
-        Color.RED to ContextCompat.getColor(context, R.color.mtg_red),
-        Color.GREEN to ContextCompat.getColor(context, R.color.mtg_green))
-*/
-
     private fun computeArcs() {
         arcs = if (colors.isEmpty()) {
             listOf(Arc(0f, 360f, greyColor))
