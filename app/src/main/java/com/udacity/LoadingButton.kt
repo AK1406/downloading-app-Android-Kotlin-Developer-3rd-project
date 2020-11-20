@@ -1,105 +1,130 @@
 package com.udacity
 
+import android.animation.AnimatorInflater
 import android.animation.ValueAnimator
-import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.TypedArray
 import android.graphics.*
-import android.graphics.Color
 import android.util.AttributeSet
-import android.view.MotionEvent
 import android.view.View
-import android.view.animation.LinearInterpolator
+import androidx.core.content.ContextCompat
 import kotlin.properties.Delegates
 
-
-private var isClicked: Boolean =false
 
 class LoadingButton @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
+
+    private var bgColor: Int = Color.BLACK
+    private var textColor: Int = Color.BLACK // default color
+
     private var widthSize = 0
     private var heightSize = 0
-    private var centralText ="DOWNLOAD"
 
-    private var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed)
-    { p, old, new ->
+    @Volatile
+    private var progress: Double = 0.0
 
+    private var valueAnimator: ValueAnimator
+
+    private var buttonState: ButtonState by Delegates.observable(ButtonState.Completed) { p, old, new ->
     }
 
-    var mPercentage = 0f
-    var mBgColor :Int = 0
-    var mFgColor:Int = 0
+    private val updateListener = ValueAnimator.AnimatorUpdateListener {
+        progress = (it.animatedValue as Float).toDouble()
 
-     var  mPaintBar : Paint
-     var mPaintProgress : Paint
+        invalidate()
+        requestLayout()
+    }
 
-    private val paint : Paint= Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    fun hasCompletedDownload() {
+        // cancel the animation when file is downloaded
+        valueAnimator.cancel()
+
+        buttonState = ButtonState.Completed
+        invalidate()
+        requestLayout()
+    }
+
+
+    init {
+        isClickable = true
+
+        valueAnimator = AnimatorInflater.loadAnimator(
+            context, R.animator.loading_animation
+        ) as ValueAnimator
+
+        valueAnimator.addUpdateListener(updateListener)
+
+        val attr = context.theme.obtainStyledAttributes(
+            attrs,
+            R.styleable.LoadingButton,
+            0,
+            0
+        )
+        try {
+            bgColor = attr.getColor(
+                R.styleable.LoadingButton_bgColor,
+                ContextCompat.getColor(context, R.color.colorPrimary)
+            )
+
+            textColor = attr.getColor(
+                R.styleable.LoadingButton_textColor,
+                ContextCompat.getColor(context, R.color.colorPrimary)
+            )
+        } finally {
+            attr.recycle()
+        }
+    }
+
+    private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
         textAlign = Paint.Align.CENTER
         textSize = 55.0f
         typeface = Typeface.create("", Typeface.BOLD)
     }
 
+    override fun performClick(): Boolean {
+        super.performClick()
+        if (buttonState == ButtonState.Completed) buttonState = ButtonState.Loading
+        animation()
 
-    init {
-       /// isClickable = true
-
-        val typedArray: TypedArray = getContext().obtainStyledAttributes(attrs, R.styleable.LoadingButton)
-        mBgColor = typedArray.getInteger(
-            R.styleable.LoadingButton_bgColor,
-            R.color.colorPrimaryDark
-        )
-        mFgColor = typedArray.getInteger(R.styleable.LoadingButton_fgColor, R.color.colorPrimary);
-        mPercentage = typedArray.getFloat(R.styleable.LoadingButton_percentage, 10f);
-
-        typedArray.recycle()
-        mPaintBar = Paint(Paint.ANTI_ALIAS_FLAG);
-        mPaintProgress = Paint(Paint.ANTI_ALIAS_FLAG);
-        mPaintBar.color = mBgColor;
-        mPaintProgress.color = mFgColor;
-
+        return true
     }
 
-    private fun startAnimation() {
-       val animator = ValueAnimator.ofInt(0, 100).apply {
-            duration = 650
-            interpolator = LinearInterpolator()
-            addUpdateListener { valueAnimator ->
-                mPercentage = (valueAnimator.animatedValue as Int).toFloat()
-                invalidate()
-            }
-        }
-        animator?.start()
+    private fun animation() {
+        valueAnimator.start()
     }
 
+    private val rect = RectF(
+        740f,
+        50f,
+        810f,
+        110f
+    )
 
-    override fun onDraw(canvas: Canvas?) {
 
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        canvas?.drawRect(0.0F, 0.0F, widthSize.toFloat(), heightSize.toFloat(), mPaintBar)
-        paint.color=  Color.WHITE
-        drawCenterText(canvas!!, 650.0F, 70.0F)
-        if(isClicked){
+        paint.strokeWidth = 0f
+        paint.color = bgColor
+        canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
+
+
+        if (buttonState == ButtonState.Loading) {
+            paint.color = Color.parseColor("#004349")
             canvas.drawRect(
-                0.0F,
-                0.0F,
-                (0F + getProgressWidth()),
-                heightSize.toFloat(),
-                mPaintProgress
+                0f, 0f,
+                (width * (progress / 100)).toFloat(), height.toFloat(), paint
             )
+            paint.color = Color.parseColor("#F9A825")
+            canvas.drawArc(rect, 0f, (360 * (progress / 100)).toFloat(), true, paint)
         }
+        val buttonText =
+            if (buttonState == ButtonState.Loading)
+                resources.getString(R.string.loading)
+            else resources.getString(R.string.download)
 
-    }
-
-
-    private fun getProgressWidth(): Int {
-        startAnimation()
-        return if (mPercentage in 0.0..100.0) {
-            ((widthSize * mPercentage / 100).toInt())
-        } else {
-            0
-        }
+        paint.color = textColor
+        canvas.drawText(buttonText, (width / 2).toFloat(), ((height + 30) / 2).toFloat(), paint)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -113,38 +138,5 @@ class LoadingButton @JvmOverloads constructor(
         widthSize = w
         heightSize = h
         setMeasuredDimension(w, h)
-    }
-
-
-
-    private fun drawCenterText(canvas: Canvas, x: Float, y: Float) {
-        val centralTextBounds = Rect()
-        centralText = when(isClicked){
-            true -> "We are loading"
-            false -> "DOWNLOAD"
-        }
-        paint.getTextBounds(centralText, 0, centralText.length, centralTextBounds)
-        val centralTextHeight = centralTextBounds.height()
-        val centralTextWidth = centralTextBounds.width()
-        val x1 = x - centralTextWidth / 2
-        val y1 = y + centralTextHeight / 2
-        canvas.drawText(centralText, x1, y1, paint)
-    }
-
-
-
-    @SuppressLint("ClickableViewAccessibility")
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        val touchY = event.y.toDouble()
-        when (event.action) {
-            MotionEvent.ACTION_MOVE -> {
-                if (touchY >= height / 2) {
-                    isClicked = true
-                }
-                this.invalidate()
-                return true
-            }
-        }
-        return super.onTouchEvent(event)
     }
 }

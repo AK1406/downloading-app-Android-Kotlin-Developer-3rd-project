@@ -15,12 +15,15 @@
     <string name="glide">Glide - Image Loading Library by Bump Tech</string>
     <string name="load">LoadApp - Current repository by Udacity</string>
     <string name="retrofit">Retrofit - Type-safe HTTP client for Android and Java by Square, Inc</string>
-    <string name="notification_channel_id">Loading Channel</string>
     <string name="notification_channel_name">Loading</string>
-    <string name="download">Downloaded !</string>
+    <string name="download">Download</string>
     <string name="check">Check</string>
     <string name="downloaded_file_name">downloaded file name</string>
-    <string name="file_name">File Name:</string>
-    <string name="status">Status:</string>
+    <string name="fileName">File Name:</string>
+    <string name="statusTitle">Status:</string>
     <string name="status_of_download">status of download</string>
+    <string name="loading">We are loading</string>
+    <string name="notification_channel_id">Load your file</string>
+    <string name="name_of_file">Name of file</string>
+    <string name="status">status</string>
 </resources>
